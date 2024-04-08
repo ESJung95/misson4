@@ -5,12 +5,14 @@ import com.zerobase.fastlms.admin.mapper.MemberMapper;
 import com.zerobase.fastlms.admin.model.MemberParam;
 import com.zerobase.fastlms.components.MailComponents;
 import com.zerobase.fastlms.course.model.ServiceResult;
+import com.zerobase.fastlms.member.entity.LoginHistory;
 import com.zerobase.fastlms.member.entity.Member;
 import com.zerobase.fastlms.member.entity.MemberCode;
 import com.zerobase.fastlms.member.exception.MemberNotEmailAuthException;
 import com.zerobase.fastlms.member.exception.MemberStopUserException;
 import com.zerobase.fastlms.member.model.MemberInput;
 import com.zerobase.fastlms.member.model.ResetPasswordInput;
+import com.zerobase.fastlms.member.repository.LoginHistoryRepository;
 import com.zerobase.fastlms.member.repository.MemberRepository;
 import com.zerobase.fastlms.member.service.MemberService;
 import com.zerobase.fastlms.util.PasswordUtils;
@@ -24,7 +26,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,21 @@ public class MemberServiceImpl implements MemberService {
     
     private final MemberRepository memberRepository;
     private final MailComponents mailComponents;
-    
+    private final LoginHistoryRepository loginHistoryRepository;
     private final MemberMapper memberMapper;
-    
+
+
+    // 로그인 하면 정보를 히스토리에 저장
+    @Override
+    public void processLogin(String userId, String loginIp) {
+        LoginHistory loginHistory = new LoginHistory();
+        loginHistory.setUserId(userId);
+        loginHistory.setLoginIp(loginIp);
+        loginHistory.setLoginDate(LocalDateTime.now());
+
+        loginHistoryRepository.save(loginHistory);
+    }
+
     /**
      * 회원 가입
      */

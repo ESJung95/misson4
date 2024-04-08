@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.List;
 
 public interface MemberService extends UserDetailsService {
-    
+
+    void processLogin(String userId, String loginIp);
+
     boolean register(MemberInput parameter);
     
     /**
